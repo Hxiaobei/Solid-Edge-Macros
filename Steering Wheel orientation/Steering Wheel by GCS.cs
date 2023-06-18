@@ -62,13 +62,19 @@ namespace Steering_Wheel_by_GCS
 			double eyeX, eyeY, eyeZ, targetX, targetY, targetZ, upX, upY, upZ, scaleOrAngle;
 			bool perspective;
 			view.GetCamera(out eyeX, out eyeY, out eyeZ, out targetX, out targetY, out targetZ, out upX, out upY, out upZ, out perspective, out scaleOrAngle);
-			steeringWheel.Align(SolidEdgeFramework.seSteeringWheelConstants.seSteeringWheelConstantsZAxis, eyeX - targetX, eyeY - targetY, eyeZ - targetZ);
-			steeringWheel.Align(SolidEdgeFramework.seSteeringWheelConstants.seSteeringWheelConstantsYAxis, upX, upY, upZ);
+			double[] eyePoint = new double[] {eyeX,eyeY,eyeZ};
+			double[] targetPoint = new double[] {targetX,targetY,targetZ};
+			double[] ZAx = GetUnitVec(eyePoint, targetPoint);
+			double[] YAx = {Math.Round(upX, 5), Math.Round(upY, 5), Math.Round(upZ, 5) };
+			steeringWheel.Align((seSteeringWheelConstants)3, ZAx[0], ZAx[1], ZAx[2]);
+			steeringWheel.Align((seSteeringWheelConstants)2, YAx[0], YAx[1], YAx[2]);
 		}
 		
-		static void OrientSteeringWheelByGCS(SolidEdgeFramework.SteeringWheel steeringWheel){
-			steeringWheel.Align(SolidEdgeFramework.seSteeringWheelConstants.seSteeringWheelConstantsZAxis, 0, 0, 1);
-			steeringWheel.Align(SolidEdgeFramework.seSteeringWheelConstants.seSteeringWheelConstantsYAxis, 0, 1, 0);
+		private static double[] GetUnitVec(double[] fromPoint, double[] toPoint){
+		    double dist = Math.Sqrt((fromPoint[0] - toPoint[0]) * (fromPoint[0] - toPoint[0]) +
+			(fromPoint[1] - toPoint[1]) * (fromPoint[1] - toPoint[1]) +
+			(fromPoint[2] - toPoint[2]) * (fromPoint[2] - toPoint[2]));
+		    return new double[] { (toPoint[0] - fromPoint[0]) / dist, (toPoint[1] - fromPoint[1]) / dist, (toPoint[2] - fromPoint[2]) / dist };
 		}
 	}
 }
